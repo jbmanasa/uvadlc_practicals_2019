@@ -12,7 +12,7 @@ import os
 from mlp_numpy import MLP
 from modules import CrossEntropyModule
 import cifar10_utils
-
+import cifar10_utils
 # Default constants
 DNN_HIDDEN_UNITS_DEFAULT = '100'
 LEARNING_RATE_DEFAULT = 2e-3
@@ -46,7 +46,7 @@ def accuracy(predictions, targets):
   ########################
   # PUT YOUR CODE HERE  #
   #######################
-  raise NotImplementedError
+  accuracy = (predictions.argmax(axis=1) == targets.argmax(axis=1)).mean()
   ########################
   # END OF YOUR CODE    #
   #######################
@@ -76,7 +76,48 @@ def train():
   ########################
   # PUT YOUR CODE HERE  #
   #######################
-  raise NotImplementedError
+  #Parameters
+  max_steps = FLAGS.max_steps
+  batch_size = FLAGS.batch_size
+  learning_rate = FLAGS.learning_rate
+  eval_freq = FLAGS.eval_freq
+  data_dir = FLAGS.data_dir
+
+  #Get data
+  data = cifar10_utils.get_cifar10(data_dir)
+  train_data = data['train']
+  validation_data = data['validation']
+  test_data = data['test']
+
+  #Get the shape of all data
+  (_, channels, image_dim, _) = train_data.images.shape
+  (_, mlp_classes) = train_data.labels.shape
+  mlp_input_size = image_dim * image_dim * channels
+
+  #Initialize the MLP
+  NN = MLP(mlp_input_size, dnn_hidden_units, mlp_classes)
+
+  for step in range(0,max_steps):
+    x, y = train_data.next_batch(batch_size)
+    x = np.reshape(x, [batch_size, mlp_input_size])
+
+    out = NN.forward(x)
+    loss = NN.loss_function.forward(out, y)
+    dx = NN.loss_function.backward(out, y)
+    NN.backward(dx)
+
+    #Update weights
+    for layer in NN.layers:
+      layer.params['weight'] = layer.params['weight'] - learning_rate * layer.grads['weight']
+      layer.params['bias']   = layer.params['bias'] - learning_rate * layer.grads['bias']
+
+    if (step%eval_freq == 0) or step == max_steps-1:
+      test_data_x, test_data_y = test_data.images.reshape((test_data.images.shape[0], mlp_input_size)), test_data.labels
+      test_out = NN.forward(test_data_x)
+      test_loss = NN.loss_function.forward(test_out, test_data_y)
+      test_accuracy = accuracy(test_out, test_data_y)
+      print("Step:", step, "Train Loss:", loss, "Test Loss:", test_loss, "Test Accuracy:", test_accuracy)
+
   ########################
   # END OF YOUR CODE    #
   #######################

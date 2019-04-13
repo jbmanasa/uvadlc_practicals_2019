@@ -5,7 +5,7 @@ You should fill in code into indicated sections.
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import torch.nn as nn
 class MLP(nn.Module):
   """
   This class implements a Multi-layer Perceptron in PyTorch.
@@ -34,7 +34,14 @@ class MLP(nn.Module):
     ########################
     # PUT YOUR CODE HERE  #
     #######################
-    raise NotImplementedError
+    super(MLP, self).__init__()
+    self.model = nn.Sequential(
+      nn.Linear(n_inputs, n_hidden),
+      nn.ReLU(),
+      nn.Linear(n_hidden, n_classes),
+      nn.Sigmoid()
+    )
+    self.loss_fn = nn.CrossEntropyLoss()
     ########################
     # END OF YOUR CODE    #
     #######################
@@ -56,7 +63,7 @@ class MLP(nn.Module):
     ########################
     # PUT YOUR CODE HERE  #
     #######################
-    raise NotImplementedError
+    out = self.model(x)
     ########################
     # END OF YOUR CODE    #
     #######################

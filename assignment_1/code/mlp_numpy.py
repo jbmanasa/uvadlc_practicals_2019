@@ -36,7 +36,25 @@ class MLP(object):
     ########################
     # PUT YOUR CODE HERE  #
     #######################
-    raise NotImplementedError
+    self.layers = []
+    self.activations = []
+
+    no_hidden_layers = len(n_hidden) #Total number of hidden layers
+
+    #Connection from input to first hidden layer
+    self.layers.append(LinearModule(n_inputs, n_hidden[0]))
+    self.activations.append(ReLUModule())
+
+    #Hidden layers
+    for layer in range(0, no_hidden_layers-1):
+      self.layers.append(LinearModule(n_hidden[layer], n_hidden[layer+1]))
+      self.activations.append(ReLUModule())
+
+    #Last hidden layer to output layer
+    self.layers.append(LinearModule(n_hidden[-1], n_classes))
+    self.activations.append(SoftMaxModule())
+
+    self.loss_function = CrossEntropyModule()
     ########################
     # END OF YOUR CODE    #
     #######################
@@ -58,7 +76,11 @@ class MLP(object):
     ########################
     # PUT YOUR CODE HERE  #
     #######################
-    raise NotImplementedError
+    out = x
+    for idx, layer in enumerate(self.layers):
+      out = layer.forward(out)
+      out = self.activations[idx].forward(out)
+
     ########################
     # END OF YOUR CODE    #
     #######################
@@ -79,7 +101,10 @@ class MLP(object):
     ########################
     # PUT YOUR CODE HERE  #
     #######################
-    raise NotImplementedError
+    for layer_idx, layer in reversed(list(enumerate(self.layers))):
+      dout = self.activations[layer_idx].backward(dout)
+      dout =layer.backward(dout)
+
     ########################
     # END OF YOUR CODE    #
     #######################

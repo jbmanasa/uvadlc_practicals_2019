@@ -11,6 +11,8 @@ import numpy as np
 import os
 from mlp_pytorch import MLP
 import cifar10_utils
+import torch
+from torch.autograd import Variable
 
 # Default constants
 DNN_HIDDEN_UNITS_DEFAULT = '100'
@@ -75,7 +77,27 @@ def train():
   ########################
   # PUT YOUR CODE HERE  #
   #######################
-  raise NotImplementedError
+  batch_size = 100
+  image_dim = 32
+  channels = 3
+  mlp_classes = 10
+  mlp_input_size = image_dim * image_dim * channels
+  data = cifar10_utils.get_cifar10()
+  train_data = data['train']
+  validation_data = data['validation']
+  test_data = data['test']
+  NN = MLP(mlp_input_size, dnn_hidden_units[0], mlp_classes)
+  x, y = train_data.next_batch(batch_size)
+  print(x.shape, y.shape)
+  for image_label in zip(x, y):
+    im = np.reshape(image_label[0], (1, mlp_input_size))
+    im = torch.tensor(im)
+    out = NN.forward(im)
+    print(out, image_label[1])
+    # lt = torch.tensor(image_label[1])
+    # print(out.item(), lt.view)
+    # loss = NN.loss_fn(out, )
+    # print(loss)
   ########################
   # END OF YOUR CODE    #
   #######################

@@ -1,0 +1,11 @@
+
+*.gz
+
+assignment_1/code/cifar10/cifar-10-batches-py/*
+*.pyc
+assignment_1/code/.pytest_cache/README.md
+*.xml
+*.iml
+assignment_1/code/.pytest_cache/v/cache/lastfailed
+assignment_1/code/.pytest_cache/v/cache/nodeids
+assignment_1/code/temp.py
